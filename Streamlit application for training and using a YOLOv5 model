@@ -1,0 +1,91 @@
+import streamlit as st
+import os
+import yaml
+import shutil
+from pathlib import Path
+import base64
+
+# Sidebar content
+st.sidebar.title("Help")
+
+def sidebar_image(image_path):
+    with open(image_path, "rb") as img_file:
+        img_data = img_file.read()
+    encoded_img = base64.b64encode(img_data).decode()
+    img_html = f'<img src="data:image/png;base64,{encoded_img}" style="width:100%;">'
+    st.sidebar.markdown(img_html, unsafe_allow_html=True)
+
+st.sidebar.markdown("""
+### Tutorial
+**[Training the model]**
+1. **Before training the model**, create a dataset by following the instructions in the Before training the Model link.
+2. **train_data** should consist of two folders: `images` and `labels`.
+   Each folder consists of two subfolders: `train` and `val`.
+   Upload each folder by dragging or dropping it to the appropriate location.
+""")
+sidebar_image("../yolov5/folders.png")
+st.sidebar.markdown("""
+3. **Validation** should be performed on a separate validation set.
+    (Usually about 5% of the dataset is used for validation.)
+4. Enter the number of labels used when creating the dataset in the **Enter number of classes (ex: 5)** field.
+5. Enter the names of the labels you specified when creating the dataset in the **Enter class names (comma separated, ex: L1, L2, L3, L4, L5)** field.
+6. If you performed steps 3 and 4, click the **Save Configuration** button.
+If the phrase “Configuration saved to corning.yaml” appears below the button, it is successful.
+7. Select the number of times to train the model repeatedly in the **Enter number of epochs** field.
+8. The **Train the Model** button, which allows you to train the model, is activated only after step 5 is performed.
+""")
+st.sidebar.markdown("""
+**[Detect Image]**
+1. To evaluate the performance of your model, you need to perform tests (corresponding to steps 1-7) on the test set.
+2. Upload the image you want to test by dragging or dropping it to the appropriate location.
+3. Click the Run YOLO Model button to run image detection.
+4. **Detection** refers to the label name of the detected image.
+**Coordinates** refer to the positions of the four corners of the square that appear in the detected image.
+**Accuracy** refers to prediction accuracy.
+""")
+
+# Function to set background image
+def set_background(image_path):
+    with open(image_path, "rb") as f:
+        data = f.read()
+    encoded_image = base64.b64encode(data).decode()
+    background_image = f"""
+    <style>
+    .stApp {{
+        background-image: url(data:image/png;base64,{encoded_image});
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    .title-container {{
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }}
+    .title-container h1 {{
+        font-size: 80px;
+        color: white;
+    }}
+    .column-container {{
+        display: flex;
+        justify-content: space-between;
+        gap: 80px;
+    }}
+    .sidebar .sidebar-content {{
+        background-color: #E9D8F6;
+    }}
+    .file-upload-container {{
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }}
+    </style>
+    """
+    st.markdown(background_image, unsafe_allow_html=True)
+
+# Function to display HTML file content
+def display_html(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        html_content = file.read()
+    st.markdown(html_content, unsafe_allow_html=True)
+
+# Path to the background image
